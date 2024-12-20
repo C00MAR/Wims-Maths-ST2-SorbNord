@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Régression Linéaire - Vecteurs</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container py-5">
+        <h1 class="text-center mb-5">Régression Linéaire - Vecteurs</h1>
+        
+        <div class="row">
+            <div class="col-md-6 mx-auto">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Entrer les données</h5>
+                        <form id="dataForm">
+                            <div class="mb-3">
+                                <label class="form-label">Écart-type de X (σx)</label>
+                                <input type="number" class="form-control" id="sigmaX" step="0.01">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Écart-type de Y (σy)</label>
+                                <input type="number" class="form-control" id="sigmaY" step="0.01">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Coefficient de corrélation (r)</label>
+                                <input type="number" class="form-control" id="correlation" step="0.001" min="-1" max="1">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Échelle (cm par unité)</label>
+                                <input type="number" class="form-control" id="scale" step="0.01" value="0.27">
+                            </div>
+                            <button type="button" class="btn btn-success" onclick="calculateVectors()">Calculer</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="results" class="row mt-4" style="display: none;">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Résultats</h5>
+                        <div id="vectorResults"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function calculateVectors() {
+            const sigmaX = parseFloat(document.getElementById('sigmaX').value);
+            const sigmaY = parseFloat(document.getElementById('sigmaY').value);
+            const r = parseFloat(document.getElementById('correlation').value);
+            const scale = parseFloat(document.getElementById('scale').value);
+
+            if (isNaN(sigmaX) || isNaN(sigmaY) || isNaN(r) || isNaN(scale)) {
+                alert('Veuillez remplir tous les champs avec des valeurs valides');
+                return;
+            }
+
+            // Calculs
+            const lengthX0 = sigmaX * scale;
+            const lengthY0 = sigmaY * scale;
+            const lengthYTilde0 = Math.abs(r) * lengthY0;
+            const lengthE = Math.sqrt(1 - r*r) * lengthY0;
+            const alpha = Math.acos(r) * (180/Math.PI);
+
+            document.getElementById('results').style.display = 'block';
+            document.getElementById('vectorResults').innerHTML = `
+                <h6 class="mt-3">Longueurs des vecteurs (en cm):</h6>
+                <ul class="list-group">
+                    <li class="list-group-item">xI0: ${lengthX0.toFixed(1)} cm</li>
+                    <li class="list-group-item">yI0: ${lengthY0.toFixed(1)} cm</li>
+                    <li class="list-group-item">ỹI0: ${lengthYTilde0.toFixed(1)} cm</li>
+                    <li class="list-group-item">eI: ${lengthE.toFixed(1)} cm</li>
+                    <li class="list-group-item">Angle alpha: ${alpha.toFixed(1)}°</li>
+                </ul>`;
+        }
+    </script>
+</body>
+</html>

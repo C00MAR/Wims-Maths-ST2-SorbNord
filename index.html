@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercices par Semaine</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .week-card {
+            transition: transform 0.2s;
+        }
+        .week-card:hover {
+            transform: scale(1.02);
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container py-5">
+        <h1 class="text-center mb-5">Exercices par Semaine</h1>
+        
+        <div class="row g-4">
+            <!-- Semaines 1-7 -->
+            <div class="col-md-6 col-lg-4" id="week1">
+                <div class="card week-card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Semaine 1</h5>
+                        <p class="card-text text-muted">Contenu à venir</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <div class="card week-card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Semaine 5</h5>
+                        <div class="list-group">
+                            <a href="semaine5/regression-lineaire.html" class="list-group-item list-group-item-action">Régression Linéaire - Variances</a>
+                            <a href="semaine5/regression-vecteurs.html" class="list-group-item list-group-item-action">Régression Linéaire - Vecteurs</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-4">
+                <div class="card week-card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Semaine 7</h5>
+                        <div class="list-group">
+                            <a href="semaine7/contingence.html" class="list-group-item list-group-item-action">
+                                Exercice Contingence
+                            </a>
+                            <a href="semaine7/phi2.html" class="list-group-item list-group-item-action">
+                                Exercice Phi²
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Semaine 8 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card week-card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Semaine 8</h5>
+                        <div class="list-group">
+                            <a href="semaine8/inter-intra.html" class="list-group-item list-group-item-action">Exercice Inter-Intra</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

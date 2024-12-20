@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyse Phi²</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container py-5">
+        <h1 class="text-center mb-5">Analyse Phi²</h1>
+        
+        <div class="row">
+            <div class="col-md-6 mx-auto">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Entrer les données</h5>
+                        <form id="dataForm">
+                            <div class="mb-3">
+                                <label class="form-label">Dimensions du tableau</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="rows" min="2" value="2">
+                                    <span class="input-group-text">x</span>
+                                    <input type="number" class="form-control" id="cols" min="2" value="2">
+                                    <button type="button" class="btn btn-primary" onclick="createTable()">Générer</button>
+                                </div>
+                            </div>
+                            <div id="tableContainer"></div>
+                            <button type="button" class="btn btn-success mt-3" onclick="analyzeData()">Analyser</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="results" class="row mt-4" style="display: none;">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Résultats</h5>
+                        <div id="theoreticalEffectives"></div>
+                        <div id="contributions"></div>
+                        <div id="phiSquare" class="mt-3"></div>
+                        <div id="relativeContrib" class="mt-3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="phi2%203x2.js"></script>
+    <script>
+        function createTable() {
+            const rows = parseInt(document.getElementById('rows').value);
+            const cols = parseInt(document.getElementById('cols').value);
+            let html = '<table class="table table-bordered mt-3">';
+            
+            for(let i = 0; i < rows; i++) {
+                html += '<tr>';
+                for(let j = 0; j < cols; j++) {
+                    html += `<td><input type="number" class="form-control" id="cell_${i}_${j}" value="0" min="0"></td>`;
+                }
+                html += '</tr>';
+            }
+            html += '</table>';
+            
+            document.getElementById('tableContainer').innerHTML = html;
+        }
+
+        function analyzeData() {
+            const rows = parseInt(document.getElementById('rows').value);
+            const cols = parseInt(document.getElementById('cols').value);
+            const data = [];
+            
+            for(let i = 0; i < rows; i++) {
+                const row = [];
+                for(let j = 0; j < cols; j++) {
+                    row.push(parseInt(document.getElementById(`cell_${i}_${j}`).value) || 0);
+                }
+                data.push(row);
+            }
+            
+            const results = analyzeContingencyTable(data);
+            
+            // Afficher les résultats
+            document.getElementById('results').style.display = 'block';
+            
+            // Effectifs théoriques
+            let theoreticalHtml = '<h6 class="mt-4">Effectifs théoriques</h6><table class="table table-bordered">';
+            results.theoreticalEffectives.forEach((row, i) => {
+                theoreticalHtml += '<tr>';
+                row.forEach(val => {
+                    theoreticalHtml += `<td>${val.toFixed(3)}</td>`;
+                });
+                theoreticalHtml += '</tr>';
+            });
+            theoreticalHtml += '</table>';
+            
+            // Contributions par ligne et colonne
+            let ctaHtml = `<h6 class="mt-4">Contributions par ligne (Ctaj)</h6>
+            <p>${results.ctaJ.map((val, i) => `Ligne ${i+1}: ${val.toFixed(4)}`).join(', ')}</p>
+            <h6 class="mt-4">Contributions par colonne (Ctak)</h6>
+            <p>${results.ctaK.map((val, i) => `Colonne ${i+1}: ${val.toFixed(4)}`).join(', ')}</p>`;
+
+            // Contributions absolues
+            let contribHtml = '<h6 class="mt-4">Contributions absolues</h6><table class="table table-bordered">';
+            results.contributionsAbsolues.forEach((row, i) => {
+                contribHtml += '<tr>';
+                row.forEach(val => {
+                    contribHtml += `<td>${val.toFixed(4)}</td>`;
+                });
+                contribHtml += '</tr>';
+            });
+            contribHtml += '</table>';
+            
+            // Phi²
+            let phiHtml = `<h6>Φ² : ${results.phiSquare}</h6>`;
+            
+            // Contributions relatives
+            let relativeHtml = `<h6>Contributions relatives</h6>
+                <p>Lignes : ${results.relativeContribJ.map(v => v.toFixed(1) + '%').join(', ')}</p>
+                <p>Colonnes : ${results.relativeContribK.map(v => v.toFixed(1) + '%').join(', ')}</p>
+                <p>La modalité ${results.maxJModalite} prend en compte ${results.maxJValue}% de la variance</p>
+                <p>La modalité ${results.maxKModalite} prend en compte ${results.maxKValue}% de la variance</p>`;
+            
+            document.getElementById('theoreticalEffectives').innerHTML = theoreticalHtml;
+            document.getElementById('contributions').innerHTML = ctaHtml + contribHtml;
+            document.getElementById('phiSquare').innerHTML = phiHtml;
+            document.getElementById('relativeContrib').innerHTML = relativeHtml;
+        }
+
+        // Créer le tableau initial
+        createTable();
+    </script>
+</body>
+</html>

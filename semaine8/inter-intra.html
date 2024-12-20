@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyse Inter-Intra</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container py-5">
+        <h1 class="text-center mb-5">Analyse Inter-Intra</h1>
+        
+        <div class="row">
+            <div class="col-md-6 mx-auto">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Entrer les données</h5>
+                        <form id="dataForm">
+                            <div class="mb-3">
+                                <label class="form-label">Nombre de groupes</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="groups" min="2" value="3">
+                                    <button type="button" class="btn btn-primary" onclick="createForm()">Générer</button>
+                                </div>
+                            </div>
+                            <div id="groupInputs"></div>
+                            <button type="button" class="btn btn-success mt-3" onclick="analyzeData()">Analyser</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="results" class="row mt-4" style="display: none;">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Résultats</h5>
+                        <div id="stats"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="./inter-intra.js"></script>
+    <script>
+        function createForm() {
+            const groupCount = parseInt(document.getElementById('groups').value);
+            let html = '';
+            
+            for(let i = 0; i < groupCount; i++) {
+                html += `
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h6>Groupe ${i + 1}</h6>
+                            <div class="mb-2">
+                                <label class="form-label">Moyenne</label>
+                                <input type="number" class="form-control" id="mean_${i}" step="0.001">
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">Variance</label>
+                                <input type="number" class="form-control" id="variance_${i}" step="0.001">
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">Effectif</label>
+                                <input type="number" class="form-control" id="effectif_${i}" min="1">
+                            </div>
+                        </div>
+                    </div>`;
+            }
+            
+            document.getElementById('groupInputs').innerHTML = html;
+        }
+
+        function analyzeData() {
+            const groupCount = parseInt(document.getElementById('groups').value);
+            const data = [];
+            
+            for(let i = 0; i < groupCount; i++) {
+                const mean = parseFloat(document.getElementById(`mean_${i}`).value);
+                const variance = parseFloat(document.getElementById(`variance_${i}`).value);
+                const effectif = parseInt(document.getElementById(`effectif_${i}`).value);
+                data.push([mean, variance, effectif]);
+            }
+            
+            const meanTotal = calculateMeanTotal(data);
+            const interVariance = calculateInterVariance(data, meanTotal);
+            const intraVariance = calculateIntraVariance(data);
+            const totalVariance = calculateTotalVariance(interVariance, intraVariance);
+            const correlationRatioSquared = calculateCorrelationRatio(interVariance, totalVariance);
+            const correlationCoef = calculateCorrelationCoef(interVariance, totalVariance);
+            
+            document.getElementById('results').style.display = 'block';
+            document.getElementById('stats').innerHTML = `
+                <ul class="list-group">
+                    <li class="list-group-item">Moyenne générale: ${meanTotal.toFixed(3)}</li>
+                    <li class="list-group-item">Variance inter: ${interVariance.toFixed(3)}</li>
+                    <li class="list-group-item">Variance intra: ${intraVariance.toFixed(3)}</li>
+                    <li class="list-group-item">Variance totale: ${totalVariance.toFixed(3)}</li>
+                    <li class="list-group-item">Carré du rapport de corrélation: ${correlationRatioSquared.toFixed(1)}%</li>
+                    <li class="list-group-item">Coefficient de corrélation: ${correlationCoef.toFixed(3)}</li>
+                </ul>`;
+        }
+
+        createForm();
+    </script>
+</body>
+</html>
