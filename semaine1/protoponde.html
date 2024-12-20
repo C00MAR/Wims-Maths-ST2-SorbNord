@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyse Proto-pondérée</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container py-5">
+        <h1 class="text-center mb-5">Analyse Proto-pondérée</h1>
+        
+        <div class="row">
+            <div class="col-md-6 mx-auto">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Entrer les données</h5>
+                        <form id="dataForm">
+                            <div class="mb-3">
+                                <label class="form-label">Nombre de points</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="points" min="2" value="3">
+                                    <button type="button" class="btn btn-primary" onclick="createForm()">Générer</button>
+                                </div>
+                            </div>
+                            <div id="pointInputs"></div>
+                            <button type="button" class="btn btn-success mt-3" onclick="analyzeData()">Analyser</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="results" class="row mt-4" style="display: none;">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Résultats</h5>
+                        <div id="stats"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="./protoponde.js"></script>
+    <script>
+        function createForm() {
+            const pointCount = parseInt(document.getElementById('points').value);
+            let html = '<div class="table-responsive"><table class="table table-bordered"><thead><tr><th>Point</th><th>Valeur</th><th>Poids</th></tr></thead><tbody>';
+            
+            for(let i = 0; i < pointCount; i++) {
+                html += `
+                    <tr>
+                        <td>j${i + 1}</td>
+                        <td><input type="number" class="form-control" id="value_${i}" step="any"></td>
+                        <td><input type="number" class="form-control" id="weight_${i}" min="0" step="any"></td>
+                    </tr>`;
+            }
+            html += '</tbody></table></div>';
+            
+            document.getElementById('pointInputs').innerHTML = html;
+        }
+
+        function analyzeData() {
+            const pointCount = parseInt(document.getElementById('points').value);
+            const data = [];
+            
+            for(let i = 0; i < pointCount; i++) {
+                const value = parseFloat(document.getElementById(`value_${i}`).value);
+                const weight = parseFloat(document.getElementById(`weight_${i}`).value);
+                if (!isNaN(value) && !isNaN(weight)) {
+                    data.push([value, weight]);
+                }
+            }
+            
+            const results = calculateStats(data);
+            
+            document.getElementById('results').style.display = 'block';
+            document.getElementById('stats').innerHTML = `
+                <ul class="list-group">
+                    <li class="list-group-item">Moyenne pondérée : ${results.mean}</li>
+                    <li class="list-group-item">Écart-type pondéré : ${results.stdDev}</li>
+                    <li class="list-group-item">Variance pondérée : ${results.variance}</li>
+                </ul>`;
+        }
+
+        createForm();
+    </script>
+</body>
+</html>

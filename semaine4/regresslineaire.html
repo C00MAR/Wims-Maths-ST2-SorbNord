@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Régression Linéaire Simple</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container py-5">
+        <h1 class="text-center mb-5">Régression Linéaire Simple</h1>
+        
+        <div class="row">
+            <div class="col-md-6 mx-auto">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Entrer les données</h5>
+                        <form id="dataForm">
+                            <div class="mb-3">
+                                <label class="form-label">Nombre de points</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="points" min="2" value="8">
+                                    <button type="button" class="btn btn-primary" onclick="createForm()">Générer</button>
+                                </div>
+                            </div>
+                            <div id="pointInputs"></div>
+                            <div class="mb-3 mt-3">
+                                <label class="form-label">Valeur de x pour estimation</label>
+                                <input type="number" class="form-control" id="xEstimate" step="any">
+                            </div>
+                            <button type="button" class="btn btn-success" onclick="analyzeData()">Analyser</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="results" class="row mt-4" style="display: none;">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Résultats</h5>
+                        <div id="coefficients"></div>
+                        <div id="estimation" class="mt-3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="./regresslineaire.js"></script>
+    <script>
+        function createForm() {
+            const pointCount = parseInt(document.getElementById('points').value);
+            let html = '<div class="table-responsive"><table class="table table-bordered"><thead><tr><th>Point</th><th>X</th><th>Y</th></tr></thead><tbody>';
+            
+            for(let i = 0; i < pointCount; i++) {
+                html += `
+                    <tr>
+                        <td>${i + 1}</td>
+                        <td><input type="number" class="form-control" id="x_${i}" step="any"></td>
+                        <td><input type="number" class="form-control" id="y_${i}" step="any"></td>
+                    </tr>`;
+            }
+            html += '</tbody></table></div>';
+            
+            document.getElementById('pointInputs').innerHTML = html;
+        }
+
+        function analyzeData() {
+            const pointCount = parseInt(document.getElementById('points').value);
+            const data = [];
+            
+            for(let i = 0; i < pointCount; i++) {
+                const x = parseFloat(document.getElementById(`x_${i}`).value);
+                const y = parseFloat(document.getElementById(`y_${i}`).value);
+                if (!isNaN(x) && !isNaN(y)) {
+                    data.push([x, y]);
+                }
+            }
+            
+            const {a, b} = calculateRegression(data);
+            const xEstimate = parseFloat(document.getElementById('xEstimate').value);
+            const yEstimate = estimate(a, b, xEstimate);
+            
+            document.getElementById('results').style.display = 'block';
+            document.getElementById('coefficients').innerHTML = `
+                <p>Équation de régression : y = ${a}x + ${b}</p><br>
+                <p>a : ${a}</p>
+                <p>b : ${b}</p>`;
+            
+            if (!isNaN(xEstimate)) {
+                document.getElementById('estimation').innerHTML = `
+                    <p>Estimation ỹ : ${yEstimate}</p>`;
+            }
+        }
+
+        createForm();
+    </script>
+</body>
+</html>
